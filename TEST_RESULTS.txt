@@ -1,0 +1,10 @@
+LTA // POCKET v1.0 — validation results
+
+PASS: Portable DSP compiled with g++ -std=c++17 -O2 on Linux.
+PASS: 55Hz phone-speaker attenuation significantly higher than at 1500Hz.
+PASS: Earbuds retain significantly more 55Hz energy than phone profile.
+PASS: Six devices x four environments generate finite bounded audio outputs.
+PASS: 12-second preview ring buffer and JUCE UI/parameters implemented in source.
+PASS: Source/artwork/workflow paths packaged.
+NOT YET VERIFIED: Complete Windows JUCE VST3 compile, FL Studio scan, GUI behaviour inside FL Studio,
+real hardware listening-calibration tests. GitHub Actions will run the full build.

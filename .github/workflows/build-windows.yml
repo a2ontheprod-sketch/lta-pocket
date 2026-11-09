@@ -1,0 +1,40 @@
+name: Build LTA Pocket VST3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build-windows-vst3:
+    runs-on: windows-2022
+    steps:
+      - name: Check out LTA Pocket
+        uses: actions/checkout@v4
+
+      - name: Configure JUCE project
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build LTA Pocket VST3
+        run: cmake --build build --config Release --target LTA_Pocket_VST3 --parallel 4
+
+      - name: Stage VST3 folder
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stage = Join-Path $PWD 'artifact-staging'
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          $plugins = @(Get-ChildItem -Path 'build' -Recurse -Directory -Filter '*.vst3')
+          if ($plugins.Count -ne 1) {
+            $plugins | ForEach-Object { Write-Host $_.FullName }
+            throw "Expected exactly one .vst3 folder, found $($plugins.Count)."
+          }
+          Copy-Item -LiteralPath $plugins[0].FullName -Destination $stage -Recurse -Force
+          Write-Host "Successfully staged $($plugins[0].FullName)"
+
+      - name: Upload Windows plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: LTA-POCKET-Windows-VST3
+          path: artifact-staging/
+          if-no-files-found: error
